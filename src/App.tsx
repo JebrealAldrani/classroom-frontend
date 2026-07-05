@@ -26,7 +26,7 @@ import { Toaster } from "./components/refine-ui/notification/toaster";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 
-import DashboardPage from "./pages/dashboard";
+import DashboardPage from "./pages/Dashboard.tsx";
 import {BookOpen, Home} from "lucide-react";
 import SubjectsList from "@/pages/subjects/List.tsx";
 import SubjectsCreate from "@/pages/subjects/Create.tsx";
