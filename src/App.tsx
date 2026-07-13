@@ -1,94 +1,94 @@
 import {
-  Refine,
-  // GitHubBanner,
-  // WelcomePage,
-  // Authenticated,
+    Refine,
+    // GitHubBanner,
+    // WelcomePage,
+    // Authenticated,
 } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import {DevtoolsPanel, DevtoolsProvider} from "@refinedev/devtools";
+import {RefineKbar, RefineKbarProvider} from "@refinedev/kbar";
 
-import { BrowserRouter, Route, Routes, Outlet } from "react-router";
+import {BrowserRouter, Route, Routes, Outlet} from "react-router";
 import routerProvider, {
-  // NavigateToResource,
-  // CatchAllNavigate,
-  UnsavedChangesNotifier,
-  DocumentTitleHandler,
+    // NavigateToResource,
+    // CatchAllNavigate,
+    UnsavedChangesNotifier,
+    DocumentTitleHandler,
 } from "@refinedev/react-router";
-import { dataProvider } from "./providers/data";
+import {dataProvider} from "@/providers/data.ts";
 // import { Login } from "./pages/login";
 // import { Register } from "./pages/register";
 // import { ForgotPassword } from "./pages/forgot-password";
 // import { ErrorComponent } from "./components/refine-ui/layout/error-component";
-import { Layout } from "./components/refine-ui/layout/layout";
+import {Layout} from "./components/refine-ui/layout/layout";
 // import { Header } from "./components/refine-ui/layout/header";
-import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
-import { Toaster } from "./components/refine-ui/notification/toaster";
-import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
+import {useNotificationProvider} from "./components/refine-ui/notification/use-notification-provider";
+import {Toaster} from "./components/refine-ui/notification/toaster";
+import {ThemeProvider} from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 
-import DashboardPage from "./pages/dashboard";
+import DashboardPage from "./pages/Dashboard.tsx";
 import {BookOpen, Home} from "lucide-react";
 import SubjectsList from "@/pages/subjects/List.tsx";
 import SubjectsCreate from "@/pages/subjects/Create.tsx";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <RefineKbarProvider>
-        <ThemeProvider>
-          <DevtoolsProvider>
-            <Refine
-              dataProvider={dataProvider}
-              notificationProvider={useNotificationProvider()}
-              routerProvider={routerProvider}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: true,
-                projectId: "c8JvZt-mXDbdl-77f60J",
-              }}
-              resources={[
-                {
-                  name: 'dashboard',
-                  list: '/',
+    return (
+        <BrowserRouter>
+            <RefineKbarProvider>
+                <ThemeProvider>
+                    <DevtoolsProvider>
+                        <Refine
+                            dataProvider={dataProvider}
+                            notificationProvider={useNotificationProvider()}
+                            routerProvider={routerProvider}
+                            options={{
+                                syncWithLocation: true,
+                                warnWhenUnsavedChanges: true,
+                                projectId: "c8JvZt-mXDbdl-77f60J",
+                            }}
+                            resources={[
+                                {
+                                    name: 'dashboard',
+                                    list: '/',
 
-                  meta: {
-                    label: 'Home',
-                    icon: <Home />
-                  }
-                },
-                {
-                  name: 'subjects',
-                  list: '/subjects',
-                  create: '/subjects/create',
-                  meta: { label: 'Subjects', icon: <BookOpen /> }
-                }
-              ]}
-            >
-              <Routes>
-                <Route element={
-                  <Layout>
-                    <Outlet/>
-                  </Layout>
-                }>
-                  <Route path={"/"} element={<DashboardPage />} />
-                  <Route path={'/subjects'}>
-                    <Route index element={<SubjectsList />}></Route>
-                    <Route path={'create'} element={<SubjectsCreate />}></Route>
-                  </Route>
-                </Route>
+                                    meta: {
+                                        label: 'Home',
+                                        icon: <Home/>
+                                    }
+                                },
+                                {
+                                    name: 'subjects',
+                                    list: '/subjects',
+                                    create: '/subjects/create',
+                                    meta: {label: 'Subjects', icon: <BookOpen/>}
+                                }
+                            ]}
+                        >
+                            <Routes>
+                                <Route element={
+                                    <Layout>
+                                        <Outlet/>
+                                    </Layout>
+                                }>
+                                    <Route path={"/"} element={<DashboardPage/>}/>
+                                    <Route path={'/subjects'}>
+                                        <Route index element={<SubjectsList/>}></Route>
+                                        <Route path={'create'} element={<SubjectsCreate/>}></Route>
+                                    </Route>
+                                </Route>
 
-              </Routes>
-              <Toaster />
-              <RefineKbar />
-              <UnsavedChangesNotifier />
-              <DocumentTitleHandler />
-            </Refine>
-            <DevtoolsPanel />
-          </DevtoolsProvider>
-        </ThemeProvider>
-      </RefineKbarProvider>
-    </BrowserRouter>
-  );
+                            </Routes>
+                            <Toaster/>
+                            <RefineKbar/>
+                            <UnsavedChangesNotifier/>
+                            <DocumentTitleHandler/>
+                        </Refine>
+                        <DevtoolsPanel/>
+                    </DevtoolsProvider>
+                </ThemeProvider>
+            </RefineKbarProvider>
+        </BrowserRouter>
+    );
 }
 
 export default App;
