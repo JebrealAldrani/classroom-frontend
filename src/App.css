@@ -13,10 +13,6 @@
   }
 }
 
-@import "tailwindcss";
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --background: oklch(0.9751 0.0127 244.2507);
   --foreground: oklch(0.3729 0.0306 259.7328);
@@ -176,21 +172,6 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-}
-
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50 antialiased;
-    font-family: var(--font-sans);
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }
 
 @layer components {
@@ -488,4 +469,5 @@
     }
   }
 }
+
 
