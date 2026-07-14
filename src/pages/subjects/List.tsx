@@ -107,7 +107,7 @@ const SubjectsList = () => {
                             </SelectContent>
                         </Select>
 
-                        <CreateButton/>
+                        <CreateButton className="ml-2"/>
                     </div>
                 </div>
             </div>
