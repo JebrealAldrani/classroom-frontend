@@ -27,9 +27,11 @@ import {ThemeProvider} from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 
 import DashboardPage from "./pages/Dashboard.tsx";
-import {BookOpen, Home} from "lucide-react";
+import {BookOpen, GraduationCap, Home} from "lucide-react";
 import SubjectsList from "@/pages/subjects/List.tsx";
 import SubjectsCreate from "@/pages/subjects/Create.tsx";
+import ClassesList from "@/pages/classes/List.tsx"
+import ClassesCreate from "@/pages/classes/Create.tsx"
 
 function App() {
     return (
@@ -61,6 +63,12 @@ function App() {
                                     list: '/subjects',
                                     create: '/subjects/create',
                                     meta: {label: 'Subjects', icon: <BookOpen/>}
+                                },
+                                {
+                                    name: 'classes',
+                                    list: '/classes',
+                                    create: '/classes/create',
+                                    meta: {label: 'Classes', icon: <GraduationCap/>}
                                 }
                             ]}
                         >
@@ -74,6 +82,11 @@ function App() {
                                     <Route path={'/subjects'}>
                                         <Route index element={<SubjectsList/>}></Route>
                                         <Route path={'create'} element={<SubjectsCreate/>}></Route>
+                                    </Route>
+
+                                    <Route path={'/classes'}>
+                                        <Route index element={<ClassesList/>}/>
+                                        <Route path="create" element={<ClassesCreate/>}/>
                                     </Route>
                                 </Route>
 

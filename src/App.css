@@ -316,8 +316,7 @@
   }
 
   .upload-preview {
-    @apply relative w-full;
-
+    @apply rounded-lg overflow-hidden relative w-full h-90 bg-cover bg-center bg-no-repeat ;
     img {
       @apply size-full object-cover rounded-md;
     }
