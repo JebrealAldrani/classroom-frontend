@@ -1,6 +1,6 @@
 import {CreateDataProviderOptions, createDataProvider} from "@refinedev/rest"
 import {VITE_BACKEND_BASE_URL} from "@/providers/constants.ts";
-import {ListResponse} from "@/types";
+import {CreateResponse, ListResponse} from "@/types";
 import {HttpError} from "@refinedev/core";
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
@@ -26,24 +26,25 @@ const options: CreateDataProviderOptions = {
         buildQueryParams: async ({resource, pagination, filters}) => {
             const page = pagination?.currentPage ?? 1
             const pageSize = pagination?.pageSize ?? 10;
-
+        
             const params: Record<string, string | number> = {page, limit: pageSize}
-
+        
             filters?.forEach((filter) => {
                 const field = 'field' in filter ? filter.field : ''
-
+        
                 const value = String(filter.value);
                 if (resource === 'subjects') {
                     if (field === 'department') params.department = value;
                     if (field === 'name' || field === 'code') params.search = value
                 }
             })
-
+        
             return params;
         },
 
         mapResponse: async (response) => {
             if(!response.ok) throw await buildHttpError(response);
+
             const payload: ListResponse = await response.clone().json();
 
             return payload.data ?? [];
@@ -53,6 +54,18 @@ const options: CreateDataProviderOptions = {
             const payload: ListResponse = await response.clone().json();
 
             return payload.pagination?.total ?? payload.data?.length ?? 0;
+        }
+    },
+
+    create: {
+        getEndpoint: ({resource}) => resource,
+
+        buildBodyParams: async ({variables}) => variables,
+
+        mapResponse: async (response) => {
+            const json: CreateResponse = await response.json();
+
+            return json?.data ?? [];
         }
     }
 }

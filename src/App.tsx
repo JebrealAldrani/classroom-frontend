@@ -27,7 +27,7 @@ import {ThemeProvider} from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
 
 import DashboardPage from "./pages/Dashboard.tsx";
-import {BookOpen, GraduationCap, Home} from "lucide-react";
+import {BookOpen, GraduationCap, Home, User} from "lucide-react";
 import SubjectsList from "@/pages/subjects/List.tsx";
 import SubjectsCreate from "@/pages/subjects/Create.tsx";
 import ClassesList from "@/pages/classes/List.tsx"
@@ -37,8 +37,8 @@ function App() {
     return (
         <BrowserRouter>
             <RefineKbarProvider>
-                <ThemeProvider>
-                    <DevtoolsProvider>
+                <DevtoolsProvider>
+                    <ThemeProvider>
                         <Refine
                             dataProvider={dataProvider}
                             notificationProvider={useNotificationProvider()}
@@ -69,6 +69,12 @@ function App() {
                                     list: '/classes',
                                     create: '/classes/create',
                                     meta: {label: 'Classes', icon: <GraduationCap/>}
+                                },
+                                {
+                                    name: 'users',
+                                    list: '/users',
+                                    create: '/users/create',
+                                    meta: {label: 'Users', icon: <User/>}
                                 }
                             ]}
                         >
@@ -97,8 +103,9 @@ function App() {
                             <DocumentTitleHandler/>
                         </Refine>
                         <DevtoolsPanel/>
-                    </DevtoolsProvider>
-                </ThemeProvider>
+                    </ThemeProvider>
+                </DevtoolsProvider>
+
             </RefineKbarProvider>
         </BrowserRouter>
     );
