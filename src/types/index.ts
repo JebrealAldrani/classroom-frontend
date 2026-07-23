@@ -83,6 +83,32 @@ export type User = {
     department?: string;
 };
 
+export type Class = {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    subject_id: string;
+    teacher_id: string;
+    invite_code: string;
+    banner_cld_pub_id: string;
+    banner_url: string;
+    name: string;
+    description: string;
+    capacity: number;
+    status: string;
+    schedules: string[];
+    subject: Subject;
+    user: User;
+    enrollments: Enrollment;
+}
+
+export type Enrollment = {
+    student_id: string;
+    class_id: string;
+    class: Class;
+    user: User
+}
+
 export type Schedule = {
     day: string;
     startTime: string;
