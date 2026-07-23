@@ -20,48 +20,109 @@ const List = () => {
     const classesTable = useTable<Class>({
         columns: useMemo<ColumnDef<Class>[]>(() => [
             {
-                id: 'code',
-                accessorKey: 'code',
-                size: 100,
-                header: () => <p className="column-title ml-2">Code</p>,
-                cell: ({getValue}) => <Badge>{getValue<string>()}</Badge>
-            },
-            {
                 id: 'name',
                 accessorKey: 'name',
-                size: 200,
+                size: 220,
                 header: () => <p className="column-title">Name</p>,
-                cell: ({getValue}) => <span className='text-foreground'>{getValue<string>()}</span>,
+                cell: ({getValue}) => (
+                    <span className="text-foreground font-medium">
+                    {getValue<string>()}
+                </span>
+                ),
                 filterFn: 'includesString'
             },
             {
-                id: 'department',
-                accessorKey: 'department.name',
+                id: 'subject',
+                accessorKey: 'subject.name',
+                size: 180,
+                header: () => <p className="column-title">Subject</p>,
+                cell: ({getValue}) => (
+                    <Badge variant="secondary">
+                        {getValue<string>()}
+                    </Badge>
+                )
+            },
+            {
+                id: 'teacher',
+                accessorKey: 'user.name',
+                size: 180,
+                header: () => <p className="column-title">Teacher</p>,
+                cell: ({getValue}) => (
+                    <span className="text-foreground">
+                    {getValue<string>()}
+                </span>
+                )
+            },
+            {
+                id: 'capacity',
+                accessorKey: 'capacity',
+                size: 120,
+                header: () => <p className="column-title">Capacity</p>,
+                cell: ({getValue}) => (
+                    <Badge variant="outline">
+                        {getValue<number>()}
+                    </Badge>
+                )
+            },
+            {
+                id: 'status',
+                accessorKey: 'status',
+                size: 120,
+                header: () => <p className="column-title">Status</p>,
+                cell: ({getValue}) => (
+                    <Badge
+                        variant={
+                            getValue<string>() === 'active'
+                                ? 'default'
+                                : 'secondary'
+                        }
+                    >
+                        {getValue<string>()}
+                    </Badge>
+                )
+            },
+            {
+                id: 'inviteCode',
+                accessorKey: 'invite_code',
                 size: 150,
-                header: () => <p className="column-title">Department</p>,
-                cell: ({getValue}) => <Badge variant="secondary">{getValue<string>()}</Badge>
+                header: () => <p className="column-title">Invite Code</p>,
+                cell: ({getValue}) => (
+                    <Badge variant="outline">
+                        {getValue<string>()}
+                    </Badge>
+                )
             },
             {
                 id: 'description',
                 accessorKey: 'description',
                 size: 300,
                 header: () => <p className="column-title">Description</p>,
-                cell: ({getValue}) => <span className="truncate line-clamb-2">{getValue<string>()}</span>
+                cell: ({getValue}) => (
+                    <span className="truncate line-clamp-2">
+                    {getValue<string>()}
+                </span>
+                )
             }
         ], []),
         refineCoreProps: {
             resource: 'classes',
-            pagination: {pageSize: 10, mode: 'server'},
+            pagination: {
+                pageSize: 10,
+                mode: 'server'
+            },
             filters: {
                 permanent: [...searchFilters]
             },
             sorters: {
                 initial: [
-                    {field: 'id', order: 'desc'}
+                    {
+                        field: 'id',
+                        order: 'desc'
+                    }
                 ]
             }
         }
-    })
+    });
     return (
         <ListView>
             <Breadcrumb/>
