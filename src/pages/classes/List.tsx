@@ -67,7 +67,7 @@ const List = () => {
             <Breadcrumb/>
             <h1 className="page-title">Classes</h1>
             <div className="intro-row">
-                <p>manage classes in classroom system management</p>
+                <p>manage classes in CSM</p>
 
                 <div className="actions-row">
                     <div className="search-field">
