@@ -83,7 +83,7 @@ const List = () => {
             },
             {
                 id: 'inviteCode',
-                accessorKey: 'invite_code',
+                accessorKey: 'inviteCode',
                 size: 150,
                 header: () => <p className="column-title">Invite Code</p>,
                 cell: ({getValue}) => (
@@ -95,7 +95,7 @@ const List = () => {
             {
                 id: 'description',
                 accessorKey: 'description',
-                size: 300,
+                size: 250,
                 header: () => <p className="column-title">Description</p>,
                 cell: ({getValue}) => (
                     <span className="truncate line-clamp-2">
@@ -123,6 +123,7 @@ const List = () => {
             }
         }
     });
+
     return (
         <ListView>
             <Breadcrumb/>

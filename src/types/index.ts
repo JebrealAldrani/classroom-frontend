@@ -89,7 +89,7 @@ export type Class = {
     updatedAt: string;
     subject_id: string;
     teacher_id: string;
-    invite_code: string;
+    inviteCode: string;
     banner_cld_pub_id: string;
     banner_url: string;
     name: string;

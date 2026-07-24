@@ -32,6 +32,8 @@ import SubjectsList from "@/pages/subjects/List.tsx";
 import SubjectsCreate from "@/pages/subjects/Create.tsx";
 import ClassesList from "@/pages/classes/List.tsx"
 import ClassesCreate from "@/pages/classes/Create.tsx"
+import UsersList from "@/pages/users/List.tsx";
+import CreateUser from "@/pages/users/Create.tsx";
 
 function App() {
     return (
@@ -93,6 +95,11 @@ function App() {
                                     <Route path={'/classes'}>
                                         <Route index element={<ClassesList/>}/>
                                         <Route path="create" element={<ClassesCreate/>}/>
+                                    </Route>
+
+                                    <Route path={'/users'}>
+                                        <Route index element={<UsersList/>}/>
+                                        <Route path="create" element={<CreateUser/>}/>
                                     </Route>
                                 </Route>
 
