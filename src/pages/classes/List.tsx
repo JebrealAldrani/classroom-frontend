@@ -9,6 +9,7 @@ import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input.tsx";
 import {CreateButton} from "@/components/refine-ui/buttons/create.tsx";
 import {DataTable} from "@/components/refine-ui/data-table/data-table.tsx";
+import {ShowButton} from "@/components/refine-ui/buttons/show.tsx";
 
 const List = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -23,13 +24,30 @@ const List = () => {
                 id: 'name',
                 accessorKey: 'name',
                 size: 220,
-                header: () => <p className="column-title">Name</p>,
+                header: () => <p className="column-title ml-2">Name</p>,
                 cell: ({getValue}) => (
                     <span className="text-foreground font-medium">
                     {getValue<string>()}
                 </span>
                 ),
                 filterFn: 'includesString'
+            },
+            {
+                id: 'status',
+                accessorKey: 'status',
+                size: 120,
+                header: () => <p className="column-title">Status</p>,
+                cell: ({getValue}) => (
+                    <Badge
+                        variant={
+                            getValue<string>() === 'active'
+                                ? 'default'
+                                : 'secondary'
+                        }
+                    >
+                        {getValue<string>()}
+                    </Badge>
+                )
             },
             {
                 id: 'subject',
@@ -64,43 +82,36 @@ const List = () => {
                     </Badge>
                 )
             },
+
+            // {
+            //     id: 'inviteCode',
+            //     accessorKey: 'inviteCode',
+            //     size: 150,
+            //     header: () => <p className="column-title">Invite Code</p>,
+            //     cell: ({getValue}) => (
+            //         <Badge variant="outline">
+            //             {getValue<string>()}
+            //         </Badge>
+            //     )
+            // },
+            // {
+            //     id: 'description',
+            //     accessorKey: 'description',
+            //     size: 250,
+            //     header: () => <p className="column-title">Description</p>,
+            //     cell: ({getValue}) => (
+            //         <span className="truncate line-clamp-2">
+            //         {getValue<string>()}
+            //     </span>
+            //     )
+            // },
             {
-                id: 'status',
-                accessorKey: 'status',
-                size: 120,
-                header: () => <p className="column-title">Status</p>,
-                cell: ({getValue}) => (
-                    <Badge
-                        variant={
-                            getValue<string>() === 'active'
-                                ? 'default'
-                                : 'secondary'
-                        }
-                    >
-                        {getValue<string>()}
-                    </Badge>
-                )
-            },
-            {
-                id: 'inviteCode',
-                accessorKey: 'inviteCode',
-                size: 150,
-                header: () => <p className="column-title">Invite Code</p>,
-                cell: ({getValue}) => (
-                    <Badge variant="outline">
-                        {getValue<string>()}
-                    </Badge>
-                )
-            },
-            {
-                id: 'description',
-                accessorKey: 'description',
-                size: 250,
-                header: () => <p className="column-title">Description</p>,
-                cell: ({getValue}) => (
-                    <span className="truncate line-clamp-2">
-                    {getValue<string>()}
-                </span>
+                id: 'details',
+                size: 140,
+                header: () => <p className="column-title">Details</p>,
+                cell: ({row}) => (
+                    <ShowButton resource="classes" recordItemId={row.original.id} variant="outline"
+                                size="sm">View</ShowButton>
                 )
             }
         ], []),
