@@ -34,6 +34,7 @@ import ClassesList from "@/pages/classes/List.tsx"
 import ClassesCreate from "@/pages/classes/Create.tsx"
 import UsersList from "@/pages/users/List.tsx";
 import CreateUser from "@/pages/users/Create.tsx";
+import ClassShow from "@/pages/classes/Show.tsx";
 
 function App() {
     return (
@@ -70,6 +71,7 @@ function App() {
                                     name: 'classes',
                                     list: '/classes',
                                     create: '/classes/create',
+                                    show: 'classes/show/:id',
                                     meta: {label: 'Classes', icon: <GraduationCap/>}
                                 },
                                 {
@@ -95,6 +97,7 @@ function App() {
                                     <Route path={'/classes'}>
                                         <Route index element={<ClassesList/>}/>
                                         <Route path="create" element={<ClassesCreate/>}/>
+                                        <Route path="show/:id" element={<ClassShow/>}/>
                                     </Route>
 
                                     <Route path={'/users'}>
