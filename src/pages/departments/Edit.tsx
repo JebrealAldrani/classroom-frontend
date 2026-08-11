@@ -1,9 +1,10 @@
-import { useBack } from "@refinedev/core";
+import { useEffect } from "react";
+import { useShow, useBack } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
-import { subjectSchema } from "@/lib/schema.ts";
+import { departmentSchema } from "@/lib/schema.ts";
 import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
-import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
+import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import {
@@ -20,17 +21,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input.tsx";
+import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import * as z from "zod";
+import type { Department } from "@/types";
 
-const SubjectsCreate = () => {
+const DepartmentsEdit = () => {
   const back = useBack();
-  const form = useForm<z.infer<typeof subjectSchema>>({
-    resolver: zodResolver(subjectSchema),
+  const { query } = useShow<Department>({ resource: "departments" });
+  const department = query.data?.data;
+
+  const form = useForm<Department>({
+    resolver: zodResolver(departmentSchema),
     refineCoreProps: {
-      resource: "subjects",
-      action: "create",
+      resource: "departments",
+      action: "edit",
     },
   });
 
@@ -39,24 +43,31 @@ const SubjectsCreate = () => {
     handleSubmit,
     formState: { isSubmitting },
     control,
+    reset,
   } = form;
 
-  const onSubmit = async (values: z.infer<typeof subjectSchema>) => {
+  useEffect(() => {
+    if (department) {
+      reset(department);
+    }
+  }, [department, reset]);
+
+  const onSubmit = async (values: Department) => {
     await onFinish(values);
   };
 
   return (
     <CreateView>
       <Breadcrumb />
-      <h1 className="page-title">Create Subject</h1>
+      <h1 className="page-title">Edit Department</h1>
       <div className="intro-row">
-        <p>Define a new curriculum subject for the classroom.</p>
+        <p>Update department details and description.</p>
         <Button onClick={() => back()}>Go Back</Button>
       </div>
       <Separator />
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>Subject details</CardTitle>
+          <CardTitle>Department settings</CardTitle>
         </CardHeader>
         <Separator />
         <CardContent>
@@ -64,25 +75,12 @@ const SubjectsCreate = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Biology" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Code</FormLabel>
+                    <FormLabel>Department Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="BIO101" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,12 +88,12 @@ const SubjectsCreate = () => {
               />
               <FormField
                 control={control}
-                name="department"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Department</FormLabel>
+                    <FormLabel>Department Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Computer Science" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,7 +106,7 @@ const SubjectsCreate = () => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="Describe the subject" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,10 +116,10 @@ const SubjectsCreate = () => {
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating...
+                    Saving...
                   </div>
                 ) : (
-                  "Create Subject"
+                  "Save changes"
                 )}
               </Button>
             </form>
@@ -132,4 +130,4 @@ const SubjectsCreate = () => {
   );
 };
 
-export default SubjectsCreate;
+export default DepartmentsEdit;

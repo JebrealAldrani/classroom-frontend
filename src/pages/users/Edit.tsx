@@ -1,9 +1,10 @@
-import { useBack } from "@refinedev/core";
+import { useEffect } from "react";
+import { useShow, useBack } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
-import { subjectSchema } from "@/lib/schema.ts";
-import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
-import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
+import { schema } from "@/lib/schema.ts";
+import { EditView } from "@/components/refine-ui/views/edit-view.tsx";
+import { EditViewHeader } from "@/components/refine-ui/views/edit-view.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import {
@@ -21,16 +22,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.tsx";
 import { Loader2 } from "lucide-react";
+import type { User } from "@/types";
 import * as z from "zod";
 
-const SubjectsCreate = () => {
+const UsersEdit = () => {
   const back = useBack();
-  const form = useForm<z.infer<typeof subjectSchema>>({
-    resolver: zodResolver(subjectSchema),
+  const { query: showQuery } = useShow<User>({ resource: "users" });
+  const user = showQuery.data?.data;
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     refineCoreProps: {
-      resource: "subjects",
-      action: "create",
+      resource: "users",
+      action: "edit",
     },
   });
 
@@ -39,24 +51,35 @@ const SubjectsCreate = () => {
     handleSubmit,
     formState: { isSubmitting },
     control,
+    reset,
   } = form;
 
-  const onSubmit = async (values: z.infer<typeof subjectSchema>) => {
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department ?? "",
+      });
+    }
+  }, [user, reset]);
+
+  const onSubmit = async (values: z.infer<typeof schema>) => {
     await onFinish(values);
   };
 
   return (
-    <CreateView>
-      <Breadcrumb />
-      <h1 className="page-title">Create Subject</h1>
+    <EditView>
+      <EditViewHeader resource="users" title="Edit User" />
       <div className="intro-row">
-        <p>Define a new curriculum subject for the classroom.</p>
+        <p>Update the user profile and access role.</p>
         <Button onClick={() => back()}>Go Back</Button>
       </div>
       <Separator />
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>Subject details</CardTitle>
+          <CardTitle>Edit user</CardTitle>
         </CardHeader>
         <Separator />
         <CardContent>
@@ -69,7 +92,7 @@ const SubjectsCreate = () => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Biology" {...field} />
+                      <Input placeholder="Jane Doe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -77,12 +100,43 @@ const SubjectsCreate = () => {
               />
               <FormField
                 control={control}
-                name="code"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Code</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="BIO101" {...field} />
+                      <Input
+                        placeholder="jane@example.com"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="teacher">Teacher</SelectItem>
+                          <SelectItem value="student">Student</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -101,35 +155,22 @@ const SubjectsCreate = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Describe the subject" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <Button type="submit" size="lg" className="w-full">
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating...
+                    Saving...
                   </div>
                 ) : (
-                  "Create Subject"
+                  "Save Changes"
                 )}
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
-    </CreateView>
+    </EditView>
   );
 };
 
-export default SubjectsCreate;
+export default UsersEdit;

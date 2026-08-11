@@ -1,85 +1,101 @@
-import {CreateDataProviderOptions, createDataProvider} from "@refinedev/rest"
-import {VITE_BACKEND_BASE_URL} from "@/providers/constants.ts";
-import {CreateResponse, GetOneResponse, ListResponse} from "@/types";
-import {HttpError} from "@refinedev/core";
+import { CreateDataProviderOptions, createDataProvider } from "@refinedev/rest";
+import { VITE_BACKEND_BASE_URL } from "@/providers/constants.ts";
+import { CreateResponse, GetOneResponse, ListResponse } from "@/types";
+import { HttpError } from "@refinedev/core";
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
-    let message = 'Failed Request'
+  let message = "Failed Request";
 
-    try {
-        const payload = (await response.json()) as { message?: string }
-        if(payload?.message) message = payload.message;
-    } catch {
-        //ignore errors
-    }
+  try {
+    const payload = (await response.json()) as { message?: string };
+    if (payload?.message) message = payload.message;
+  } catch {
+    //ignore errors
+  }
 
-    return {
-        message: message,
-        statusCode: response.status
-    }
-}
+  return {
+    message: message,
+    statusCode: response.status,
+  };
+};
 
 const options: CreateDataProviderOptions = {
-    getList: {
-        getEndpoint: ({resource}) => resource,
+  getList: {
+    getEndpoint: ({ resource }) => resource,
 
-        buildQueryParams: async ({resource, pagination, filters}) => {
-            const page = pagination?.currentPage ?? 1
-            const pageSize = pagination?.pageSize ?? 10;
-        
-            const params: Record<string, string | number> = {page, limit: pageSize}
-        
-            filters?.forEach((filter) => {
-                const field = 'field' in filter ? filter.field : ''
-        
-                const value = String(filter.value);
-                if (resource === 'subjects') {
-                    if (field === 'department') params.department = value;
-                    if (field === 'name' || field === 'code') params.search = value
-                }
-            })
-        
-            return params;
-        },
+    buildQueryParams: async ({ resource, pagination, filters }) => {
+      const page = pagination?.currentPage ?? 1;
+      const pageSize = pagination?.pageSize ?? 10;
 
-        mapResponse: async (response) => {
-            if(!response.ok) throw await buildHttpError(response);
+      const params: Record<string, string | number> = { page, limit: pageSize };
 
-            const payload: ListResponse = await response.clone().json();
+      if (resource === "users") {
+        params.current = page;
+        params.pageSize = pageSize;
+        params.filters = JSON.stringify(filters ?? []);
+      }
 
-            return payload.data ?? [];
-        },
+      filters?.forEach((filter) => {
+        const field = "field" in filter ? filter.field : "";
+        const value = String(filter.value);
 
-        getTotalCount: async (response) => {
-            const payload: ListResponse = await response.clone().json();
-
-            return payload.pagination?.total ?? payload.data?.length ?? 0;
+        if (resource === "subjects") {
+          if (field === "department") params.department = value;
+          if (field === "name" || field === "code") params.search = value;
         }
+
+        if (resource === "classes") {
+          if (field === "status") params.status = value;
+          if (field === "name" || field === "description")
+            params.search = value;
+        }
+
+        if (resource === "departments") {
+          if (field === "name" || field === "code") params.search = value;
+        }
+      });
+
+      return params;
     },
 
-    create: {
-        getEndpoint: ({resource}) => resource,
+    mapResponse: async (response) => {
+      if (!response.ok) throw await buildHttpError(response);
 
-        buildBodyParams: async ({variables}) => variables,
+      const payload: ListResponse = await response.clone().json();
 
-        mapResponse: async (response) => {
-            const json: CreateResponse = await response.json();
-
-            return json?.data ?? [];
-        }
+      return payload.data ?? [];
     },
 
-    getOne: {
-        getEndpoint: ({resource, id}) => `${resource}/${id}`,
+    getTotalCount: async (response) => {
+      const payload: ListResponse = await response.clone().json();
 
-        mapResponse: async (response) => {
-            const json: GetOneResponse = await response.json();
+      return payload.pagination?.total ?? payload.data?.length ?? 0;
+    },
+  },
 
-            return json.data ?? [];
-        }
-    }
-}
+  create: {
+    getEndpoint: ({ resource }) => resource,
 
-const {dataProvider} = createDataProvider(VITE_BACKEND_BASE_URL, options)
+    buildBodyParams: async ({ variables }) => variables,
 
-export {dataProvider}
+    mapResponse: async (response) => {
+      const json: CreateResponse = await response.json();
+
+      return json?.data ?? [];
+    },
+  },
+
+  getOne: {
+    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+
+    mapResponse: async (response) => {
+      const json: GetOneResponse = await response.json();
+
+      return json.data ?? [];
+    },
+  },
+};
+
+const { dataProvider } = createDataProvider(VITE_BACKEND_BASE_URL, options);
+
+export { dataProvider };
