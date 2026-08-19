@@ -50,103 +50,103 @@ function App() {
     <BrowserRouter>
       <RefineKbarProvider>
         {/* <DevtoolsProvider> */}
-          <ThemeProvider>
-            <Refine
-              dataProvider={dataProvider}
-              notificationProvider={useNotificationProvider()}
-              routerProvider={routerProvider}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: true,
-                projectId: "c8JvZt-mXDbdl-77f60J",
-              }}
-              resources={[
-                {
-                  name: "dashboard",
-                  list: "/",
-                  meta: {
-                    label: "Home",
-                    icon: <Home />,
-                  },
+        <ThemeProvider>
+          <Refine
+            dataProvider={dataProvider}
+            notificationProvider={useNotificationProvider()}
+            routerProvider={routerProvider}
+            options={{
+              syncWithLocation: true,
+              warnWhenUnsavedChanges: true,
+              projectId: "c8JvZt-mXDbdl-77f60J",
+            }}
+            resources={[
+              {
+                name: "dashboard",
+                list: "/",
+                meta: {
+                  label: "Home",
+                  icon: <Home />,
                 },
-                {
-                  name: "departments",
-                  list: "/departments",
-                  create: "/departments/create",
-                  show: "departments/show/:id",
-                  edit: "departments/edit/:id",
-                  meta: { label: "Departments", icon: <Building /> },
-                },
-                {
-                  name: "subjects",
-                  list: "/subjects",
-                  create: "/subjects/create",
-                  show: "subjects/show/:id",
-                  edit: "subjects/edit/:id",
-                  meta: { label: "Subjects", icon: <BookOpen /> },
-                },
-                {
-                  name: "classes",
-                  list: "/classes",
-                  create: "/classes/create",
-                  show: "classes/show/:id",
-                  edit: "classes/edit/:id",
-                  meta: { label: "Classes", icon: <GraduationCap /> },
-                },
-                {
-                  name: "users",
-                  list: "/users",
-                  create: "/users/create",
-                  show: "users/show/:id",
-                  edit: "users/edit/:id",
-                  meta: { label: "Users", icon: <User /> },
-                },
-              ]}
-            >
-              <Routes>
-                <Route
-                  element={
-                    <Layout>
-                      <Outlet />
-                    </Layout>
-                  }
-                >
-                  <Route path={"/"} element={<DashboardPage />} />
-                  <Route path={"/subjects"}>
-                    <Route index element={<SubjectsList />}></Route>
-                    <Route path={"create"} element={<SubjectsCreate />}></Route>
-                    <Route path={"show/:id"} element={<SubjectsShow />}></Route>
-                    <Route path={"edit/:id"} element={<SubjectsEdit />}></Route>
-                  </Route>
-
-                  <Route path={"/classes"}>
-                    <Route index element={<ClassesList />} />
-                    <Route path="create" element={<ClassesCreate />} />
-                    <Route path="show/:id" element={<ClassShow />} />
-                    <Route path="edit/:id" element={<ClassesEdit />} />
-                  </Route>
-
-                  <Route path={"/users"}>
-                    <Route index element={<UsersList />} />
-                    <Route path="create" element={<CreateUser />} />
-                    <Route path="show/:id" element={<UsersShow />} />
-                    <Route path="edit/:id" element={<UsersEdit />} />
-                  </Route>
-                  <Route path={"/departments"}>
-                    <Route index element={<DepartmentsList />} />
-                    <Route path="create" element={<DepartmentsCreate />} />
-                    <Route path="show/:id" element={<DepartmentsShow />} />
-                    <Route path="edit/:id" element={<DepartmentsEdit />} />
-                  </Route>
+              },
+              {
+                name: "departments",
+                list: "/departments",
+                create: "/departments/create",
+                show: "departments/show/:id",
+                edit: "departments/edit/:id",
+                meta: { label: "Departments", icon: <Building /> },
+              },
+              {
+                name: "subjects",
+                list: "/subjects",
+                create: "/subjects/create",
+                show: "subjects/show/:id",
+                edit: "subjects/edit/:id",
+                meta: { label: "Subjects", icon: <BookOpen /> },
+              },
+              {
+                name: "classes",
+                list: "/classes",
+                create: "/classes/create",
+                show: "classes/show/:id",
+                edit: "classes/edit/:id",
+                meta: { label: "Classes", icon: <GraduationCap /> },
+              },
+              {
+                name: "users",
+                list: "/users",
+                create: "/users/create",
+                show: "users/show/:id",
+                edit: "users/edit/:id",
+                meta: { label: "Users", icon: <User /> },
+              },
+            ]}
+          >
+            <Routes>
+              <Route
+                element={
+                  <Layout>
+                    <Outlet />
+                  </Layout>
+                }
+              >
+                <Route path={"/"} element={<DashboardPage />} />
+                <Route path={"/subjects"}>
+                  <Route index element={<SubjectsList />}></Route>
+                  <Route path={"create"} element={<SubjectsCreate />}></Route>
+                  <Route path={"show/:id"} element={<SubjectsShow />}></Route>
+                  <Route path={"edit/:id"} element={<SubjectsEdit />}></Route>
                 </Route>
-              </Routes>
-              <Toaster />
-              <RefineKbar />
-              <UnsavedChangesNotifier />
-              <DocumentTitleHandler />
-            </Refine>
-            {/* <DevtoolsPanel /> */}
-          </ThemeProvider>
+
+                <Route path={"/classes"}>
+                  <Route index element={<ClassesList />} />
+                  <Route path="create" element={<ClassesCreate />} />
+                  <Route path="show/:id" element={<ClassShow />} />
+                  <Route path="edit/:id" element={<ClassesEdit />} />
+                </Route>
+
+                <Route path={"/users"}>
+                  <Route index element={<UsersList />} />
+                  <Route path="create" element={<CreateUser />} />
+                  <Route path="show/:id" element={<UsersShow />} />
+                  <Route path="edit/:id" element={<UsersEdit />} />
+                </Route>
+                <Route path={"/departments"}>
+                  <Route index element={<DepartmentsList />} />
+                  <Route path="create" element={<DepartmentsCreate />} />
+                  <Route path="show/:id" element={<DepartmentsShow />} />
+                  <Route path="edit/:id" element={<DepartmentsEdit />} />
+                </Route>
+              </Route>
+            </Routes>
+            <Toaster />
+            <RefineKbar />
+            <UnsavedChangesNotifier />
+            <DocumentTitleHandler />
+          </Refine>
+          {/* <DevtoolsPanel /> */}
+        </ThemeProvider>
         {/* </DevtoolsProvider> */}
       </RefineKbarProvider>
     </BrowserRouter>

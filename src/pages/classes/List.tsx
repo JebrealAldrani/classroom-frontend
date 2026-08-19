@@ -10,7 +10,10 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
 import { CreateButton } from "@/components/refine-ui/buttons/create.tsx";
 import { DataTable } from "@/components/refine-ui/data-table/data-table.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
+import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
 import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
+import DeleteSelectedButton from "@/components/refine-ui/buttons/delete-selected";
 import { useGo } from "@refinedev/core";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -40,6 +43,8 @@ const List = () => {
 
   const classesTable = useTable<Class>({
     enableRowSelection: true,
+    //to make the table know the checked row based on id of that row not index
+    getRowId: (row) => row.id.toString(),
     columns: useMemo<ColumnDef<Class>[]>(
       () => [
         {
@@ -144,17 +149,35 @@ const List = () => {
         // },
         {
           id: "details",
-          size: 140,
-          header: () => <p className="column-title">Details</p>,
+          size: 180,
+          header: () => <p className="column-title">Actions</p>,
           cell: ({ row }) => (
-            <ShowButton
-              resource="classes"
-              recordItemId={row.original.id}
-              variant="outline"
-              size="sm"
-            >
-              View
-            </ShowButton>
+            <div className="flex items-center gap-2">
+              <ShowButton
+                resource="classes"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                View
+              </ShowButton>
+              <EditButton
+                resource="classes"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                Edit
+              </EditButton>
+              <DeleteButton
+                resource="classes"
+                recordItemId={row.original.id}
+                variant="destructive"
+                size="sm"
+              >
+                Delete
+              </DeleteButton>
+            </div>
           ),
         },
       ],
@@ -186,7 +209,7 @@ const List = () => {
     console.log(classItem);
     go({
       to: {
-        resource: "class",
+        resource: "classes",
         action: "show",
         id: classItem.id,
       },
@@ -215,7 +238,7 @@ const List = () => {
             />
           </div>
 
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex w-full sm:w-auto">
             {/*<Select*/}
             {/*    value={selectedDepartment}*/}
             {/*    onValueChange={setSelectedDepartment}*/}
@@ -232,7 +255,10 @@ const List = () => {
             {/*    </SelectContent>*/}
             {/*</Select>*/}
 
-            <CreateButton className="ml-2" />
+            <div className="flex items-center gap-2">
+              <DeleteSelectedButton table={classesTable} resource="classes" />
+              <CreateButton className="" />
+            </div>
           </div>
         </div>
       </div>

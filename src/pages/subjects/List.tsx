@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/select.tsx";
 import { DEPARTMENT_OPTIONS } from "@/constants";
 import { CreateButton } from "@/components/refine-ui/buttons/create.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
+import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
+import DeleteSelectedButton from "@/components/refine-ui/buttons/delete-selected";
 import { Input } from "@/components/ui/input.tsx";
 import { ListView } from "@/components/refine-ui/views/list-view.tsx";
 import { Search } from "lucide-react";
@@ -20,6 +23,7 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
 import { useGo } from "@refinedev/core";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
 const SubjectsList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQueryParam = searchParams.get("SubjectSearch") ?? "";
@@ -59,11 +63,13 @@ const SubjectsList = () => {
   //For configure TableData
   const subjectTable = useTable<Subject>({
     enableRowSelection: true,
+    //to make the table know the checked row based on id of that row not index
+    getRowId: (row) => row.id.toString(),
     columns: useMemo<ColumnDef<Subject>[]>(
       () => [
         {
           id: "select",
-          size: 40,
+          size: 35,
           header: ({ table }) => (
             <Checkbox
               checked={
@@ -117,6 +123,31 @@ const SubjectsList = () => {
           header: () => <p className="column-title">Description</p>,
           cell: ({ getValue }) => (
             <span className="truncate line-clamb-2">{getValue<string>()}</span>
+          ),
+        },
+        {
+          id: "actions",
+          size: 180,
+          header: () => <p className="column-title">Actions</p>,
+          cell: ({ row }) => (
+            <div className="flex justify-end gap-2">
+              <EditButton
+                resource="subjects"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                Edit
+              </EditButton>
+              <DeleteButton
+                resource="subjects"
+                recordItemId={row.original.id}
+                variant="destructive"
+                size="sm"
+              >
+                Delete
+              </DeleteButton>
+            </div>
           ),
         },
       ],
@@ -186,8 +217,10 @@ const SubjectsList = () => {
                 ))}
               </SelectContent>
             </Select>
-
-            <CreateButton className="ml-2" />
+            <div className="flex items-center gap-2">
+              <DeleteSelectedButton table={subjectTable} resource="subjects" />
+              <CreateButton />
+            </div>
           </div>
         </div>
       </div>

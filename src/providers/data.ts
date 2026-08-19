@@ -94,6 +94,52 @@ const options: CreateDataProviderOptions = {
       return json.data ?? [];
     },
   },
+
+  deleteOne: {
+    getEndpoint: ({ resource, id }) => {
+      console.log("deleteOne resource:", resource, "id:", id);
+      return `${resource}/${id}`;
+    },
+
+    // Add required headers for DELETE requests
+    buildHeaders: async () => ({
+      "Accept-Language": "en-US",
+    }),
+
+    // Extract the deleted record from API response
+    mapResponse: async (response, params) => {
+      const json: any = await response.json();
+
+      // Handle different response formats
+      if (params.resource === "categories") {
+        return json.result;
+      }
+
+      // Some APIs return just success confirmation
+      if (json.success && !json.data) {
+        // Return minimal record with just the ID for confirmation
+        return { id: params.id };
+      }
+
+      // Your API wraps the deleted record in a "data" property
+      // API returns: { "data": { "id": 123, "title": "Deleted Post" } }
+      // Refine needs: { "id": 123, "title": "Deleted Post" }
+      return json.data;
+    },
+  },
+
+  update: {
+    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+
+    buildBodyParams: async ({ variables }) => variables,
+
+    mapResponse: async (response) => {
+      if (!response.ok) throw await buildHttpError(response);
+
+      const json: any = await response.json();
+      return json.data ?? [];
+    },
+  },
 };
 
 const { dataProvider } = createDataProvider(VITE_BACKEND_BASE_URL, options);

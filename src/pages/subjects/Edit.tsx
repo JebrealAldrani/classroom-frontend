@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useShow, useBack } from "@refinedev/core";
+import { useShow, useBack, HttpError } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
 import { subjectSchema } from "@/lib/schema.ts";
@@ -31,7 +31,7 @@ const SubjectsEdit = () => {
   const { query: showQuery } = useShow<Subject>({ resource: "subjects" });
   const subject = showQuery.data?.data;
 
-  const form = useForm<z.infer<typeof subjectSchema>>({
+  const form = useForm<Subject, HttpError, z.infer<typeof subjectSchema>>({
     resolver: zodResolver(subjectSchema),
     refineCoreProps: {
       resource: "subjects",

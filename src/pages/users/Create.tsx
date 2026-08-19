@@ -1,4 +1,4 @@
-import { useBack } from "@refinedev/core";
+import { HttpError, useBack } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
 import { schema } from "@/lib/schema.ts";
@@ -30,10 +30,11 @@ import {
 } from "@/components/ui/select.tsx";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
+import { User } from "@/types";
 
 const CreateUser = () => {
   const back = useBack();
-  const form = useForm<z.infer<typeof schema>>({
+  const form = useForm<User, HttpError, z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     refineCoreProps: {
       resource: "users",

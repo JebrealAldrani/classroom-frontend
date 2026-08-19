@@ -8,10 +8,14 @@ import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
 import { CreateButton } from "@/components/refine-ui/buttons/create.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
+import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
+import DeleteSelectedButton from "@/components/refine-ui/buttons/delete-selected";
 import { DataTable } from "@/components/refine-ui/data-table/data-table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useGo } from "@refinedev/core";
+import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
 
 const DepartmentsList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,11 +32,13 @@ const DepartmentsList = () => {
 
   const departmentsTable = useTable<Department>({
     enableRowSelection: true,
+    //to make the table know the checked row based on id of that row not index
+    getRowId: (row) => row.id.toString(),
     columns: useMemo<ColumnDef<Department>[]>(
       () => [
         {
           id: "select",
-          size: 40,
+          size: 35,
           header: ({ table }) => (
             <Checkbox
               checked={
@@ -76,6 +82,31 @@ const DepartmentsList = () => {
           header: () => <p className="column-title">Description</p>,
           cell: ({ getValue }) => (
             <span className="truncate line-clamp-2">{getValue<string>()}</span>
+          ),
+        },
+        {
+          id: "actions",
+          size: 180,
+          header: () => <p className="column-title">Actions</p>,
+          cell: ({ row }) => (
+            <div className="flex justify-center items-center gap-2">
+              <EditButton
+                resource="departments"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                Edit
+              </EditButton>
+              <DeleteButton
+                resource="departments"
+                recordItemId={row.original.id}
+                variant="destructive"
+                size="sm"
+              >
+                Delete
+              </DeleteButton>
+            </div>
           ),
         },
       ],
@@ -135,7 +166,13 @@ const DepartmentsList = () => {
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <CreateButton className="ml-2" />
+          <div className="flex items-center gap-2">
+            <DeleteSelectedButton
+              table={departmentsTable}
+              resource="departments"
+            />
+            <CreateButton />
+          </div>
         </div>
       </div>
       <DataTable

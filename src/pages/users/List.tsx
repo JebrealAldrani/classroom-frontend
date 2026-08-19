@@ -5,6 +5,9 @@ import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
 import { CreateButton } from "@/components/refine-ui/buttons/create.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
+import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
+import DeleteSelectedButton from "@/components/refine-ui/buttons/delete-selected";
 import { DataTable } from "@/components/refine-ui/data-table/data-table.tsx";
 import { useTable } from "@refinedev/react-table";
 import { Subject, User } from "@/types";
@@ -39,6 +42,8 @@ const UsersList = () => {
     : [];
 
   const usersTable = useTable<User>({
+    //to make the table know the checked row based on id of that row not index
+    getRowId: (row) => row.id.toString(),
     columns: useMemo<ColumnDef<User>[]>(
       () => [
         {
@@ -125,6 +130,31 @@ const UsersList = () => {
               <Badge variant="destructive">Unverified</Badge>
             ),
         },
+        {
+          id: "actions",
+          size: 180,
+          header: () => <p className="column-title">Actions</p>,
+          cell: ({ row }) => (
+            <div className="flex justify-end gap-2">
+              <EditButton
+                resource="users"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                Edit
+              </EditButton>
+              <DeleteButton
+                resource="users"
+                recordItemId={row.original.id}
+                variant="destructive"
+                size="sm"
+              >
+                Delete
+              </DeleteButton>
+            </div>
+          ),
+        },
       ],
       [],
     ),
@@ -193,7 +223,10 @@ const UsersList = () => {
             {/*    </SelectContent>*/}
             {/*</Select>*/}
 
-            <CreateButton className="ml-2" />
+            <div className="flex items-center gap-2">
+              <DeleteSelectedButton table={usersTable} resource="users" />
+              <CreateButton />
+            </div>
           </div>
         </div>
       </div>

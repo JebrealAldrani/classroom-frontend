@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useShow, useBack } from "@refinedev/core";
+import { useShow, useBack, HttpError } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
 import { schema } from "@/lib/schema.ts";
@@ -38,7 +38,7 @@ const UsersEdit = () => {
   const { query: showQuery } = useShow<User>({ resource: "users" });
   const user = showQuery.data?.data;
 
-  const form = useForm<z.infer<typeof schema>>({
+  const form = useForm<User, HttpError, z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     refineCoreProps: {
       resource: "users",
