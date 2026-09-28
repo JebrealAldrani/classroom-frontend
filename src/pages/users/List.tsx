@@ -94,7 +94,7 @@ const UsersList = () => {
         {
           accessorKey: "name",
           header: () => <p className="column-title">Name</p>,
-          size: 220,
+          size: 130,
           cell: ({ getValue }) => (
             <span className="font-medium">{getValue<string>()}</span>
           ),
@@ -103,16 +103,28 @@ const UsersList = () => {
         {
           accessorKey: "email",
           header: () => <p className="column-title">Email</p>,
-          size: 280,
+          size: 190,
           cell: ({ getValue }) => (
             <Badge variant="secondary">{getValue<string>()}</Badge>
           ),
           filterFn: "includesString",
         },
         {
+          id: "department",
+          accessorKey: "department.name",
+          header: () => <p className="column-title">Department</p>,
+          size: 230,
+          cell: ({ row }) =>
+            row.original.department?.name ? (
+              <Badge variant="outline">{row.original.department.name}</Badge>
+            ) : (
+              <span className="text-muted-foreground">Not assigned</span>
+            ),
+        },
+        {
           accessorKey: "role",
           header: () => <p className="column-title">Role</p>,
-          size: 140,
+          size: 90,
           cell: ({ getValue }) => (
             <Badge variant="outline" className="capitalize">
               {getValue<string>()}
@@ -122,7 +134,7 @@ const UsersList = () => {
         {
           accessorKey: "emailVerified",
           header: () => <p className="column-title">Verified</p>,
-          size: 120,
+          size: 100,
           cell: ({ getValue }) =>
             getValue<boolean>() ? (
               <Badge className="bg-green-500">Verified</Badge>
@@ -132,7 +144,6 @@ const UsersList = () => {
         },
         {
           id: "actions",
-          size: 180,
           header: () => <p className="column-title">Actions</p>,
           cell: ({ row }) => (
             <div className="flex justify-end gap-2">
@@ -189,7 +200,7 @@ const UsersList = () => {
 
       <h1 className="page-title">Users</h1>
       <div className="intro-row">
-        <p>Manage USers in CMS</p>
+        <p>Manage Users in CMS</p>
 
         <div className="actions-row">
           <div className="search-field">

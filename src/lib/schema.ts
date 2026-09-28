@@ -1,15 +1,39 @@
 import * as z from "zod";
 
-export const schema = z.object({
+const userSchemaBase = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["admin", "teacher", "student"], {
     required_error: "Please select a role",
   }),
-  department: z.string().optional(),
+  departmentId: z.coerce.number().int().positive("Department is required"),
   image: z.string().optional(),
   imageCldPubId: z.string().optional(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
 });
+
+export const schema = userSchemaBase.refine(
+  (values) => values.password === values.confirmPassword,
+  {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  },
+);
+
+export const editUserSchema = userSchemaBase
+  .extend({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .optional()
+      .or(z.literal("")),
+    confirmPassword: z.string().optional().or(z.literal("")),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const departmentSchema = z.object({
   code: z.string().min(1, "Department code is required"),
@@ -23,9 +47,13 @@ export const subjectSchema = z.object({
   description: z
     .string()
     .min(5, "Subject description must be at least 5 characters"),
-  department: z
-    .string()
-    .min(2, "Subject department must be at least 2 characters"),
+  departmentId: z.coerce
+    .number({
+      required_error: "Subject department is required",
+      invalid_type_error: "Subject department is required",
+    })
+    .int("Subject department must be a valid department")
+    .positive("Subject department is required"),
 });
 
 const scheduleSchema = z.object({

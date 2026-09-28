@@ -29,8 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { Loader2 } from "lucide-react";
+import { InputPassword } from "@/components/refine-ui/form/input-password";
+import UploadWidget from "@/components/UploadWidget";
+import { useList } from "@refinedev/core";
+import type { Department } from "@/types";
 import * as z from "zod";
 import { User } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton.tsx";
 
 const CreateUser = () => {
   const back = useBack();
@@ -39,22 +44,100 @@ const CreateUser = () => {
     refineCoreProps: {
       resource: "users",
       action: "create",
+      errorNotification: (error) => ({
+        type: "error",
+        message: error?.message ?? "Unable to create user",
+      }),
     },
   });
+  const { query: departmentsQuery } = useList<Department>({
+    resource: "departments",
+    pagination: { pageSize: 1000 },
+  });
+  const departments = departmentsQuery.data?.data ?? [];
+  const departmentsLoading = departmentsQuery.isLoading;
 
   const {
     refineCore: { onFinish },
     handleSubmit,
     formState: { isSubmitting },
     control,
+    setValue,
   } = form;
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     await onFinish(values);
   };
 
+  if (departmentsLoading) {
+    return (
+      <CreateView className="class-view">
+        <Breadcrumb />
+        <h1 className="page-title">Create User</h1>
+        <div className="intro-row">
+          <p>Add a new classroom user to the system.</p>
+          <Button onClick={() => back()}>Go Back</Button>
+        </div>
+        <Separator />
+        <div className="my-4 flex items-center">
+          <Card className="class-form-card">
+            <CardHeader>
+              <Skeleton className="h-7 w-32 rounded-md" />
+            </CardHeader>
+            <Separator />
+            <CardContent className="mt-7 space-y-5">
+              {/* Avatar Skeleton */}
+              <div className="flex justify-center pb-2">
+                <Skeleton className="size-28 rounded-full" />
+              </div>
+
+              {/* Name Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Email Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Role Select Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Department Select Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Password Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Confirm Password Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Button Skeleton */}
+              <Skeleton className="h-11 w-full rounded-md" />
+            </CardContent>
+          </Card>
+        </div>
+      </CreateView>
+    );
+  }
+
   return (
-    <CreateView>
+    <CreateView className="class-view">
       <Breadcrumb />
       <h1 className="page-title">Create User</h1>
       <div className="intro-row">
@@ -62,14 +145,39 @@ const CreateUser = () => {
         <Button onClick={() => back()}>Go Back</Button>
       </div>
       <Separator />
-      <Card className="max-w-3xl">
-        <CardHeader>
-          <CardTitle>User profile</CardTitle>
-        </CardHeader>
-        <Separator />
-        <CardContent>
-          <Form {...form}>
+      <div className="my-4 flex items-center">
+        <Card className="class-form-card">
+          <CardHeader>
+            <CardTitle>User profile</CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent className="mt-7">
+            <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="sr-only">Profile image</FormLabel>
+                    <FormControl>
+                      <UploadWidget
+                        avatar
+                        value={
+                          field.value
+                            ? { url: field.value, publicId: "" }
+                            : null
+                        }
+                        onChange={(value) => {
+                          field.onChange(value?.url ?? "");
+                          setValue("imageCldPubId", value?.publicId ?? "");
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name="name"
@@ -129,12 +237,61 @@ const CreateUser = () => {
               />
               <FormField
                 control={control}
-                name="department"
+                name="departmentId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
                     <FormControl>
-                      <Input placeholder="Computer Science" {...field} />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={String(field.value ?? "")}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departments.map((department) => (
+                            <SelectItem
+                              key={department.id}
+                              value={String(department.id)}
+                            >
+                              {department.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <InputPassword
+                        placeholder="At least 8 characters"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm password</FormLabel>
+                    <FormControl>
+                      <InputPassword
+                        placeholder="Repeat the password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -154,7 +311,8 @@ const CreateUser = () => {
           </Form>
         </CardContent>
       </Card>
-    </CreateView>
+    </div>
+  </CreateView>
   );
 };
 

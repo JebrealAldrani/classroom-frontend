@@ -76,9 +76,35 @@ const options: CreateDataProviderOptions = {
   create: {
     getEndpoint: ({ resource }) => resource,
 
+    buildHeaders: async () => ({
+      "Content-Type": "application/json",
+    }),
+
     buildBodyParams: async ({ variables }) => variables,
 
+    transformError: async (response) => {
+      let message = "Unable to create user";
+
+      try {
+        const payload = (await response.json()) as {
+          message?: unknown;
+        };
+        if (typeof payload.message === "string" && payload.message.trim()) {
+          message = payload.message;
+        }
+      } catch {
+        // Keep the fallback message when the response is not valid JSON.
+      }
+
+      return {
+        message,
+        statusCode: response.status,
+      };
+    },
+
     mapResponse: async (response) => {
+      if (!response.ok) throw await buildHttpError(response);
+
       const json: CreateResponse = await response.json();
 
       return json?.data ?? [];
@@ -129,7 +155,19 @@ const options: CreateDataProviderOptions = {
   },
 
   update: {
-    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+    getEndpoint: ({ resource, id }) => {
+      const endpoint = `${resource}/${id}`;
+
+      console.log("UPDATE ENDPOINT:", endpoint);
+
+      return endpoint;
+    },
+
+    getRequestMethod: () => "put", // or "put", depending on your API
+
+    buildHeaders: async () => ({
+      "Content-Type": "application/json",
+    }),
 
     buildBodyParams: async ({ variables }) => variables,
 

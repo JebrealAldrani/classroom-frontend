@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useShow, useBack, HttpError } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
-import { schema } from "@/lib/schema.ts";
+import { editUserSchema } from "@/lib/schema.ts";
 import { EditView } from "@/components/refine-ui/views/edit-view.tsx";
 import { EditViewHeader } from "@/components/refine-ui/views/edit-view.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -31,6 +31,10 @@ import {
 } from "@/components/ui/select.tsx";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/types";
+import type { Department } from "@/types";
+import { InputPassword } from "@/components/refine-ui/form/input-password";
+import UploadWidget from "@/components/UploadWidget";
+import { useList } from "@refinedev/core";
 import * as z from "zod";
 
 const UsersEdit = () => {
@@ -38,13 +42,18 @@ const UsersEdit = () => {
   const { query: showQuery } = useShow<User>({ resource: "users" });
   const user = showQuery.data?.data;
 
-  const form = useForm<User, HttpError, z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<User, HttpError, z.infer<typeof editUserSchema>>({
+    resolver: zodResolver(editUserSchema),
     refineCoreProps: {
       resource: "users",
       action: "edit",
     },
   });
+  const { query: departmentsQuery } = useList<Department>({
+    resource: "departments",
+    pagination: { pageSize: 1000 },
+  });
+  const departments = departmentsQuery.data?.data ?? [];
 
   const {
     refineCore: { onFinish },
@@ -52,6 +61,7 @@ const UsersEdit = () => {
     formState: { isSubmitting },
     control,
     reset,
+    setValue,
   } = form;
 
   useEffect(() => {
@@ -60,12 +70,16 @@ const UsersEdit = () => {
         name: user.name,
         email: user.email,
         role: user.role,
-        department: user.department ?? "",
+        departmentId: user.departmentId,
+        image: user.image ?? "",
+        imageCldPubId: user.imageCldPubId ?? "",
+        password: "",
+        confirmPassword: "",
       });
     }
   }, [user, reset]);
 
-  const onSubmit = async (values: z.infer<typeof schema>) => {
+  const onSubmit = async (values: z.infer<typeof editUserSchema>) => {
     await onFinish(values);
   };
 
@@ -77,7 +91,7 @@ const UsersEdit = () => {
         <Button onClick={() => back()}>Go Back</Button>
       </div>
       <Separator />
-      <Card className="max-w-3xl">
+      <Card className="class-form-card">
         <CardHeader>
           <CardTitle>Edit user</CardTitle>
         </CardHeader>
@@ -85,6 +99,30 @@ const UsersEdit = () => {
         <CardContent>
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="sr-only">Profile image</FormLabel>
+                    <FormControl>
+                      <UploadWidget
+                        avatar
+                        value={
+                          field.value
+                            ? { url: field.value, publicId: "" }
+                            : null
+                        }
+                        onChange={(value) => {
+                          field.onChange(value?.url ?? "");
+                          setValue("imageCldPubId", value?.publicId ?? "");
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name="name"
@@ -144,12 +182,64 @@ const UsersEdit = () => {
               />
               <FormField
                 control={control}
-                name="department"
+                name="departmentId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
                     <FormControl>
-                      <Input placeholder="Computer Science" {...field} />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={String(field.value ?? "")}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departments.map((department) => (
+                            <SelectItem
+                              key={department.id}
+                              value={String(department.id)}
+                            >
+                              {department.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      New password{" "}
+                      <span className="text-muted-foreground">(optional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <InputPassword
+                        placeholder="Leave blank to keep current password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm new password</FormLabel>
+                    <FormControl>
+                      <InputPassword
+                        placeholder="Repeat the new password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

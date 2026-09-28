@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea.tsx";
 import { Loader2 } from "lucide-react";
 import UploadWidget from "@/components/UploadWidget.tsx";
 import { Subject, User } from "@/types/index.js";
+import { Skeleton } from "@/components/ui/skeleton.tsx";
 
 const Create = () => {
   const back = useBack();
@@ -43,7 +44,7 @@ const Create = () => {
   const { query: subjectsQuery } = useList<Subject>({
     resource: "subjects",
     pagination: {
-      pageSize: 10,
+      pageSize: 1000,
     },
   });
 
@@ -54,12 +55,13 @@ const Create = () => {
     resource: "users",
     filters: [{ field: "role", operator: "eq", value: "teacher" }],
     pagination: {
-      pageSize: 10,
+      pageSize: 1000,
     },
   });
 
   const teachers = teachersQuery?.data?.data ?? [];
   const teachersLoading = teachersQuery?.isLoading;
+  const isSelectDataLoading = subjectsLoading || teachersLoading;
 
   const form = useForm({
     resolver: zodResolver(classSchema),
@@ -103,6 +105,81 @@ const Create = () => {
       });
     }
   };
+
+  if (isSelectDataLoading) {
+    return (
+      <CreateView className="class-view">
+        <Breadcrumb />
+
+        <h1 className="page-title">Create a Class</h1>
+        <div className="intro-row">
+          <p>Provide the required information below to add a class.</p>
+          <Button onClick={() => back()}>Go Back</Button>
+        </div>
+
+        <Separator />
+
+        <div className="my-4 flex items-center">
+          <Card className="class-form-card">
+            <CardHeader className="relative z-10">
+              <Skeleton className="h-8 w-44 rounded-md" />
+            </CardHeader>
+
+            <Separator />
+
+            <CardContent className="mt-7 space-y-5">
+              {/* Banner Upload Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-44 w-full rounded-lg" />
+              </div>
+
+              {/* Class Name Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+
+              {/* Subject & Teacher Select Skeletons */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+              </div>
+
+              {/* Capacity & Status Skeletons */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+              </div>
+
+              {/* Description Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-24 w-full rounded-md" />
+              </div>
+
+              <Separator />
+
+              {/* Button Skeleton */}
+              <Skeleton className="h-11 w-full rounded-md" />
+            </CardContent>
+          </Card>
+        </div>
+      </CreateView>
+    );
+  }
 
   return (
     <CreateView className="class-view">

@@ -46,6 +46,7 @@ const DepartmentsEdit = () => {
         resource: "departments",
         action: "edit",
         id,
+        mutationMode: "pessimistic",
       },
     },
   );
@@ -56,6 +57,7 @@ const DepartmentsEdit = () => {
     formState: { isSubmitting },
     control,
     reset,
+    setError,
   } = form;
 
   useEffect(() => {
@@ -65,7 +67,21 @@ const DepartmentsEdit = () => {
   }, [department, reset]);
 
   const onSubmit = async (values: z.infer<typeof departmentSchema>) => {
-    await onFinish(values);
+    if (department && values.code !== department.code) {
+      setError("code", {
+        type: "validate",
+        message: "Department code cannot be changed.",
+      });
+      return;
+    }
+
+    console.log("onSubmit fired with:", values);
+    try {
+      const result = await onFinish(values);
+      console.log("onFinish result:", result);
+    } catch (err) {
+      console.error("onFinish threw:", err);
+    }
   };
 
   return (
@@ -88,7 +104,12 @@ const DepartmentsEdit = () => {
           <Separator />
           <CardContent>
             <Form {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <form
+                onSubmit={handleSubmit(onSubmit, (errors) => {
+                  console.log("Form validation errors:", errors);
+                })}
+                className="space-y-5"
+              >
                 {isLoading ? (
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2">
@@ -113,8 +134,18 @@ const DepartmentsEdit = () => {
                         <FormItem>
                           <FormLabel>Department Code</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input
+                              {...field}
+                              readOnly
+                              tabIndex={-1}
+                              aria-readonly="true"
+                              aria-disabled="true"
+                              className="cursor-not-allowed bg-muted text-muted-foreground opacity-70 pointer-events-none"
+                            />
                           </FormControl>
+                          <p className="text-sm text-muted-foreground">
+                            Department code cannot be changed after creation.
+                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
