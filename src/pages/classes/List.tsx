@@ -14,13 +14,67 @@ import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
 import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
 import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
 import DeleteSelectedButton from "@/components/refine-ui/buttons/delete-selected";
-import { useGo } from "@refinedev/core";
+import { useGo, useList } from "@refinedev/core";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { User, Subject } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DEPARTMENT_OPTIONS } from "@/constants";
 
 const List = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQueryParam = searchParams.get("ClassSearch") ?? "";
   const [searchQuery, setSearchQuery] = useState(searchQueryParam);
+
+  //Select Filters For Teacher and Subject
+  const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [selectedSubject, setSelectedSubject] = useState("all");
+
+  const { query: teachersQuery } = useList<User>({
+    resource: "users",
+    pagination: { pageSize: 1000 },
+    filters: [
+      {
+        field: "role",
+        operator: "eq",
+        value: "teacher",
+      },
+    ],
+  });
+  const teachers = teachersQuery.data?.data ?? [];
+
+  const { query: subjectsQuery } = useList<Subject>({
+    resource: "subjects",
+    pagination: { pageSize: 1000 },
+  });
+  const subjects = subjectsQuery.data?.data ?? [];
+
+  const teacherFilter =
+    selectedTeacher === "all"
+      ? []
+      : [
+          {
+            field: "teacherId",
+            operator: "eq" as const,
+            value: selectedTeacher,
+          },
+        ];
+
+  const subjectFilter =
+    selectedSubject === "all"
+      ? []
+      : [
+          {
+            field: "subjectId",
+            operator: "eq" as const,
+            value: selectedSubject,
+          },
+        ];
 
   useEffect(() => {
     setSearchQuery(searchQueryParam);
@@ -124,29 +178,6 @@ const List = () => {
             <Badge variant="outline">{getValue<number>()}</Badge>
           ),
         },
-
-        // {
-        //     id: 'inviteCode',
-        //     accessorKey: 'inviteCode',
-        //     size: 150,
-        //     header: () => <p className="column-title">Invite Code</p>,
-        //     cell: ({getValue}) => (
-        //         <Badge variant="outline">
-        //             {getValue<string>()}
-        //         </Badge>
-        //     )
-        // },
-        // {
-        //     id: 'description',
-        //     accessorKey: 'description',
-        //     size: 250,
-        //     header: () => <p className="column-title">Description</p>,
-        //     cell: ({getValue}) => (
-        //         <span className="truncate line-clamp-2">
-        //         {getValue<string>()}
-        //     </span>
-        //     )
-        // },
         {
           id: "details",
           size: 180,
@@ -190,7 +221,7 @@ const List = () => {
         mode: "server",
       },
       filters: {
-        permanent: [...searchFilters],
+        permanent: [...teacherFilter, ...subjectFilter, ...searchFilters],
       },
       sorters: {
         initial: [
@@ -216,6 +247,10 @@ const List = () => {
     });
   };
 
+  useEffect(() => {
+    classesTable.refineCore.setCurrentPage(1);
+  }, [selectedSubject, selectedTeacher]);
+
   return (
     <ListView>
       <Breadcrumb />
@@ -238,22 +273,42 @@ const List = () => {
             />
           </div>
 
-          <div className="flex w-full sm:w-auto">
-            {/*<Select*/}
-            {/*    value={selectedDepartment}*/}
-            {/*    onValueChange={setSelectedDepartment}*/}
-            {/*>*/}
-            {/*    <SelectTrigger>*/}
-            {/*        <SelectValue placeholder="Filter by department"/>*/}
-            {/*    </SelectTrigger>*/}
-            {/*    <SelectContent>*/}
-            {/*        <SelectItem value="all">All Departments</SelectItem>*/}
-            {/*        {DEPARTMENT_OPTIONS.map(department => (*/}
-            {/*            <SelectItem value={department.value}*/}
-            {/*                        key={department.value}>{department.label}</SelectItem>*/}
-            {/*        ))}*/}
-            {/*    </SelectContent>*/}
-            {/*</Select>*/}
+          <div className="flex w-full gap-3 flex-wrap sm:w-auto">
+            <div className="flex gap-2">
+              <Select
+                value={selectedTeacher}
+                onValueChange={setSelectedTeacher}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by Teacher" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Teachers</SelectItem>
+                  {teachers.map((teacher) => (
+                    <SelectItem value={teacher.id.toString()} key={teacher.id}>
+                      {teacher.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={selectedSubject}
+                onValueChange={setSelectedSubject}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by Subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Subjectss</SelectItem>
+                  {subjects.map((subject) => (
+                    <SelectItem value={subject.id.toString()} key={subject.id}>
+                      {subject.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="flex items-center gap-2">
               <DeleteSelectedButton table={classesTable} resource="classes" />

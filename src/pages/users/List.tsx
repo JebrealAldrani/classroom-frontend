@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { ListView } from "@/components/refine-ui/views/list-view.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
@@ -16,11 +16,21 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGo } from "@refinedev/core";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select.tsx";
 
 const UsersList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQueryParam = searchParams.get("UserSearch") ?? "";
   const [searchQuery, setSearchQuery] = useState(searchQueryParam);
+  const [selectedRole, setSelectedRole] = useState("all");
+
+  const userRoles = ["admin", "student", "teacher"];
 
   useEffect(() => {
     setSearchQuery(searchQueryParam);
@@ -36,6 +46,17 @@ const UsersList = () => {
     }
     setSearchParams(nextParams);
   };
+
+  const rolesFilters =
+    selectedRole === "all"
+      ? []
+      : [
+          {
+            field: "role",
+            operator: "eq" as const,
+            value: selectedRole,
+          },
+        ];
 
   const searchFilters = searchQuery
     ? [{ field: "name", operator: "contains" as const, value: searchQuery }]
@@ -173,7 +194,7 @@ const UsersList = () => {
       resource: "users",
       pagination: { pageSize: 10, mode: "server" },
       filters: {
-        permanent: [...searchFilters],
+        permanent: [...rolesFilters, ...searchFilters],
       },
       sorters: {
         initial: [{ field: "id", order: "desc" }],
@@ -218,22 +239,25 @@ const UsersList = () => {
           </div>
 
           <div className="flex gap-2 w-full sm:w-auto">
-            {/*<Select*/}
-            {/*    value={selectedDepartment}*/}
-            {/*    onValueChange={setSelectedDepartment}*/}
-            {/*>*/}
-            {/*    <SelectTrigger>*/}
-            {/*        <SelectValue placeholder="Filter by department"/>*/}
-            {/*    </SelectTrigger>*/}
-            {/*    <SelectContent>*/}
-            {/*        <SelectItem value="all">All Departments</SelectItem>*/}
-            {/*        {DEPARTMENT_OPTIONS.map(department => (*/}
-            {/*            <SelectItem value={department.value}*/}
-            {/*                        key={department.value}>{department.label}</SelectItem>*/}
-            {/*        ))}*/}
-            {/*    </SelectContent>*/}
-            {/*</Select>*/}
-
+            <Select
+              value={selectedRole}
+              onValueChange={(value) => {
+                setSelectedRole(value);
+                usersTable.refineCore.setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                {userRoles.map((department) => (
+                  <SelectItem value={department} key={department}>
+                    {department}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <div className="flex items-center gap-2">
               <DeleteSelectedButton table={usersTable} resource="users" />
               <CreateButton />
