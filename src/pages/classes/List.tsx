@@ -48,11 +48,11 @@ const List = () => {
   });
   const teachers = teachersQuery.data?.data ?? [];
 
-  const { query: subjectsQuery } = useList<Subject>({
-    resource: "subjects",
-    pagination: { pageSize: 1000 },
-  });
-  const subjects = subjectsQuery.data?.data ?? [];
+  // const { query: subjectsQuery } = useList<Subject>({
+  //   resource: "subjects",
+  //   pagination: { pageSize: 1000 },
+  // });
+  // const subjects = subjectsQuery.data?.data ?? [];
 
   const teacherFilter =
     selectedTeacher === "all"
@@ -65,16 +65,16 @@ const List = () => {
           },
         ];
 
-  const subjectFilter =
-    selectedSubject === "all"
-      ? []
-      : [
-          {
-            field: "subjectId",
-            operator: "eq" as const,
-            value: selectedSubject,
-          },
-        ];
+  // const subjectFilter =
+  //   selectedSubject === "all"
+  //     ? []
+  //     : [
+  //         {
+  //           field: "subjectId",
+  //           operator: "eq" as const,
+  //           value: selectedSubject,
+  //         },
+  //       ];
 
   useEffect(() => {
     setSearchQuery(searchQueryParam);
@@ -221,7 +221,7 @@ const List = () => {
         mode: "server",
       },
       filters: {
-        permanent: [...teacherFilter, ...subjectFilter, ...searchFilters],
+        permanent: [...teacherFilter, ...searchFilters],
       },
       sorters: {
         initial: [
@@ -249,7 +249,7 @@ const List = () => {
 
   useEffect(() => {
     classesTable.refineCore.setCurrentPage(1);
-  }, [selectedSubject, selectedTeacher]);
+  }, [ selectedTeacher]);
 
   return (
     <ListView>
@@ -292,7 +292,7 @@ const List = () => {
                 </SelectContent>
               </Select>
 
-              <Select
+              {/* <Select
                 value={selectedSubject}
                 onValueChange={setSelectedSubject}
               >
@@ -307,7 +307,7 @@ const List = () => {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
 
             <div className="flex items-center gap-2">

@@ -51,9 +51,9 @@ const options: CreateDataProviderOptions = {
             params.teacherId = value;
           }
 
-          if (field === "subjectId") {
-            params.subjectId = value;
-          }
+          // if (field === "subjectId") {
+          //   params.subjectId = value;
+          // }
 
           if (field === "name" || field === "description") {
             params.search = value;
