@@ -273,7 +273,7 @@ const List = () => {
             />
           </div>
 
-          <div className="flex w-full gap-3 flex-wrap sm:w-auto">
+          <div className="flex w-full gap-3 sm:w-auto">
             <div className="flex gap-2">
               <Select
                 value={selectedTeacher}
