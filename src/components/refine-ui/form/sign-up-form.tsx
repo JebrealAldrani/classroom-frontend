@@ -24,6 +24,7 @@ import { InputPassword } from "@/components/refine-ui/form/input-password";
 import { cn } from "@/lib/utils";
 
 export const SignUpForm = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,6 +52,7 @@ export const SignUpForm = () => {
     }
 
     register({
+      name,
       email,
       password,
     });
@@ -77,7 +79,7 @@ export const SignUpForm = () => {
         "justify-center",
         "px-6",
         "py-8",
-        "min-h-svh"
+        "min-h-svh",
       )}
     >
       <div className={cn("flex", "items-center", "justify-center", "gap-2")}>
@@ -97,7 +99,7 @@ export const SignUpForm = () => {
               "text-green-600",
               "dark:text-green-400",
               "text-3xl",
-              "font-semibold"
+              "font-semibold",
             )}
           >
             Sign up
@@ -113,6 +115,16 @@ export const SignUpForm = () => {
 
         <CardContent className={cn("px-0")}>
           <form onSubmit={handleSignUp}>
+            <div className={cn("flex", "flex-col", "gap-2")}>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
             <div className={cn("flex", "flex-col", "gap-2")}>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -157,7 +169,7 @@ export const SignUpForm = () => {
                 "mt-6",
                 "bg-green-600",
                 "hover:bg-green-700",
-                "text-white"
+                "text-white",
               )}
             >
               Sign up
@@ -231,7 +243,7 @@ export const SignUpForm = () => {
                 "text-blue-600",
                 "dark:text-blue-400",
                 "font-semibold",
-                "underline"
+                "underline",
               )}
             >
               Sign in

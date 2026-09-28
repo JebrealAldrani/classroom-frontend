@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useBack, useShow, useList } from "@refinedev/core";
+import { useBack, useShow, useList, HttpError } from "@refinedev/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
@@ -32,7 +32,8 @@ import {
 } from "@/components/ui/select.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Loader2 } from "lucide-react";
-import { Class, Subject, User } from "@/types";
+import UploadWidget from "@/components/UploadWidget.tsx";
+import { Class, Subject, UploadWidgetValue, User } from "@/types";
 import * as z from "zod";
 
 const ClassesEdit = () => {
@@ -57,14 +58,18 @@ const ClassesEdit = () => {
 
   const subjects = subjectsQuery.data?.data ?? [];
   const teachers = teachersQuery.data?.data ?? [];
+  const teacherOptions = classrooms?.teacher &&
+    !teachers.some((teacher) => teacher.id === classrooms.teacher?.id)
+    ? [classrooms.teacher, ...teachers]
+    : teachers;
 
-  const form = useForm<z.infer<typeof classSchema>>({
+  const form = useForm<Class, HttpError, z.infer<typeof classSchema>>({
     resolver: zodResolver(classSchema) as any,
     refineCoreProps: {
       resource: "classes",
       action: "edit",
     },
-  });
+  }); 
 
   const {
     refineCore: { onFinish },
@@ -72,7 +77,11 @@ const ClassesEdit = () => {
     formState: { isSubmitting },
     control,
     reset,
+    setValue,
+    watch,
   } = form;
+
+  const bannerCldPubId = watch("bannerCldPubId");
 
   useEffect(() => {
     if (classrooms) {
@@ -86,13 +95,23 @@ const ClassesEdit = () => {
         bannerUrl: classrooms.bannerUrl ?? "",
         bannerCldPubId: classrooms.bannerCldPubId ?? "",
         inviteCode: classrooms.inviteCode ?? "",
-        schedules: classrooms.schedules ?? [],
       });
     }
   }, [classrooms, reset]);
 
   const onSubmit = async (values: z.infer<typeof classSchema>) => {
     await onFinish(values);
+  };
+
+  const setBannerImage = (file: UploadWidgetValue | null) => {
+    setValue("bannerUrl", file?.url ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("bannerCldPubId", file?.publicId ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   return (
@@ -104,7 +123,7 @@ const ClassesEdit = () => {
       </div>
       <Separator />
       <div className="my-4 flex items-center">
-        <Card className="max-w-3xl">
+        <Card className="class-form-card">
           <CardHeader>
             <CardTitle>Edit class</CardTitle>
           </CardHeader>
@@ -181,8 +200,8 @@ const ClassesEdit = () => {
                         <FormLabel>Teacher</FormLabel>
                         <FormControl>
                           <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                            value={field.value?.toString() ?? ""}
+                            onValueChange={(value) => field.onChange(value)}
                           >
                             <FormControl>
                               <SelectTrigger className="w-full">
@@ -190,8 +209,11 @@ const ClassesEdit = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {teachers.map((teacher) => (
-                                <SelectItem key={teacher.id} value={teacher.id}>
+                              {teacherOptions.map((teacher) => (
+                                <SelectItem
+                                  key={teacher.id}
+                                  value={teacher.id.toString()}
+                                >
                                   {teacher.name}
                                 </SelectItem>
                               ))}
@@ -256,9 +278,19 @@ const ClassesEdit = () => {
                   name="bannerUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Banner URL</FormLabel>
+                      <FormLabel>Banner Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <UploadWidget
+                          value={
+                            field.value
+                              ? {
+                                  url: field.value,
+                                  publicId: bannerCldPubId ?? "",
+                                }
+                              : null
+                          }
+                          onChange={setBannerImage}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -267,15 +299,7 @@ const ClassesEdit = () => {
                 <FormField
                   control={control}
                   name="bannerCldPubId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Banner Public ID</FormLabel>
-                      <FormControl>
-                        <Input placeholder="cloudinary-public-id" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => <input type="hidden" {...field} />}
                 />
                 <Button type="submit" size="lg" className="w-full">
                   {isSubmitting ? (

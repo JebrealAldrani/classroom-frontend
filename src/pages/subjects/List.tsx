@@ -21,14 +21,20 @@ import { Subject } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
-import { useGo } from "@refinedev/core";
+import { useGo, useList } from "@refinedev/core";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
+import type { Department } from "@/types";
 const SubjectsList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQueryParam = searchParams.get("SubjectSearch") ?? "";
   const [searchQuery, setSearchQuery] = useState(searchQueryParam);
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const { query: departmentsQuery } = useList<Department>({
+    resource: "departments",
+    pagination: { pageSize: 1000 },
+  });
+  const departments = departmentsQuery.data?.data ?? [];
 
   useEffect(() => {
     setSearchQuery(searchQueryParam);
@@ -210,9 +216,9 @@ const SubjectsList = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Departments</SelectItem>
-                {DEPARTMENT_OPTIONS.map((department) => (
-                  <SelectItem value={department.value} key={department.value}>
-                    {department.label}
+                {departments.map((department) => (
+                  <SelectItem value={department.name} key={department.id}>
+                    {department.name}
                   </SelectItem>
                 ))}
               </SelectContent>

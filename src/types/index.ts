@@ -13,6 +13,7 @@ export type Subject = {
   name: string;
   code: string;
   description: string;
+  department_id?: number;
   department?: Department;
   createdAt?: string;
 };
@@ -90,7 +91,8 @@ export type User = {
   role: UserRole;
   image?: string;
   imageCldPubId?: string;
-  department?: string;
+  departmentId?: number;
+  department?: Department;
 };
 
 export type Enrollment = {
