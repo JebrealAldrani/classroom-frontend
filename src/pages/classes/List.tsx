@@ -184,14 +184,14 @@ const List = () => {
           header: () => <p className="column-title">Actions</p>,
           cell: ({ row }) => (
             <div className="flex items-center gap-2">
-              <ShowButton
+              {/* <ShowButton
                 resource="classes"
                 recordItemId={row.original.id}
                 variant="outline"
                 size="sm"
               >
                 View
-              </ShowButton>
+              </ShowButton> */}
               <EditButton
                 resource="classes"
                 recordItemId={row.original.id}
